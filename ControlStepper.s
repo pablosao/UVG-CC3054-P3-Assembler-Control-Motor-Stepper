@@ -80,7 +80,7 @@ _confSys:
 
 	@**   verificamos que se haya ingresado un número
 	CMP   R0, #0
-	BEQ _error
+	BEQ _errorSys
 
 	@**   Identificación de operaciones
 	LDR   R0, =opcionIn
@@ -92,7 +92,7 @@ _confSys:
 	
 	@**   Inicia Programa
 	CMP   R0, #2
-	BLEQ  @_confHardware 
+	BLEQ  _confHardware 
 
 	CMP   R0, #3
 	BLEQ  _running
@@ -137,6 +137,10 @@ menuSys:
 msjOpcion:
 	.ascii "Ingrese Opción: "
 
+.align 2
+msjVueltas:
+	.ascii "Ingrese Número de Vueltas (de 1 a 99): "
+
 .align 2	
 fIngreso:
 	.asciz "%d"
@@ -147,5 +151,5 @@ opcionIn:
 
 .align 2
 msjError:
-	.ascii "\n\t\tIngreso una opción incorrecta\n"
+	.ascii "\n\t\tIngreso una opción incorrecta.\n"
 
