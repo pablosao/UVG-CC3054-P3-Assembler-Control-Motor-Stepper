@@ -9,7 +9,7 @@
 
 
 
-@****    Rutina para esperar el tiempo enviado en R0
+@****    Recibe en R0 los segundos a esperar
 .align 2
 .global ESPERA
 ESPERA:
@@ -19,6 +19,40 @@ ESPERA:
 	NOP
 
 	POP   {PC}
+
+
+@****    Ciclo infinito para movimiento
+MOVE_DERECHA:
+	PUSH  {LR}
+	
+	MOV  R12, #5
+
+	movimientoD:
+		PUSH {R12}
+		MOV  R0, #14
+		MOV  R1, #0
+		BL   SetGpio
+		
+		MOV  R0, #15
+		MOV  R1, #0
+		BL   SetGpio
+	
+		MOV   R0, #1
+		BL    ESPERA				@ Rutina de espera
+	
+		MOV  R0, #15
+		MOV  R1, #1
+		BL   SetGpio
+	
+		MOV   R0, #1
+		BL    ESPERA
+
+		POP   {R12}
+		SUBS  R12, #1
+		CMP   R12, #0
+		BNE   movimientoD
+
+	POP    {PC}
 
 @****    Suma de numero de vueltas
 .align 2
@@ -44,6 +78,8 @@ SUM_VUELTAS:
 	POP   {PC}
 
 
+
+.data
 .align 2
 .global _VUELTAS
 _VUELTAS:
@@ -58,5 +94,6 @@ _DIRECCION:
 .global _REPETICIONES
 _REPETICIONES:
 	.word 0
+
 
 

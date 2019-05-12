@@ -14,6 +14,19 @@
 main:
 	STMFD SP!, {LR}
 
+	@**   Configurando pines de salida
+	BL   GetGpioAddress			@ Llamamos dirección
+
+	MOV  R0, #14				@ Seteamos pin 
+	MOV  R1, #1				@ Configuramos salida
+
+	BL   SetGpioFunction			@ Configuramos puerto
+
+	MOV  R0, #15				@ Seteamos pin 17
+	MOV  R1, #1				@ Configuramos salida
+
+	BL   SetGpioFunction
+	
 	B     _running
 
 
@@ -97,7 +110,7 @@ _confSys:
 	
 	@**   Inicia Programa
 	CMP   R0, #2
-	BLEQ  _confHardware 
+	BLEQ  MOVE_DERECHA 
 
 	CMP   R0, #3
 	BLEQ  _running
@@ -149,14 +162,6 @@ _exit:
 	SWI   0
 	BX LR
 
-.align 2
-.global ESPERA
-@****    Recibe en R0 los segundos a esperar
-ESPERA:
-	PUSH  {LR}
-	BL sleep
-	NOP
-	POP   {PC}
 
 .data
 .align 2
@@ -191,3 +196,8 @@ msjError:
 .global CLEAR
 CLEAR:
 	.asciz "\033[H\033[J"
+
+.align 2
+.global myloc
+myloc:
+	.word 0
