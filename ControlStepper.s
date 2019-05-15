@@ -17,6 +17,7 @@ main:
 	@**   Configurando pines de salida
 	BL   GetGpioAddress			@ Llamamos dirección
 
+	/**   Configurando puertos para control de stepper   **/
 	MOV  R0, #14				@ Seteamos pin 
 	MOV  R1, #1				@ Configuramos salida
 
@@ -85,11 +86,11 @@ _confSys:
 
 	@**   Despliegue de menu para configurar por softwrare
 	LDR   R0, =menuSys
-	BL puts
+	BL    puts
 
 	@**   Mensaje de ingreso de opción:
 	LDR   R0, =msjOpcion
-	BL puts
+	BL    puts
 
 	@**   Comando para Ingreso de teclado
 	LDR   R0, =fIngreso
@@ -98,7 +99,7 @@ _confSys:
 
 	@**   verificamos que se haya ingresado un número
 	CMP   R0, #0
-	BEQ _errorSys
+	BEQ   _errorSys
 
 	@**   Identificación de operaciones
 	LDR   R0, =opcionIn

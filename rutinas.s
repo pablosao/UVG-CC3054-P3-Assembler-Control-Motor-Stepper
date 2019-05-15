@@ -38,12 +38,14 @@ ESPERAMICRO:
 MOVE_DERECHA:
 	PUSH  {LR}
 	
-	MOV  R12, #5
+	MOV  R12, #6
 
 	movimientoD:
 		PUSH {R12}
+		
+		@**  Cable azul
 		MOV  R0, #14
-		MOV  R1, #1
+		MOV  R1, #0
 		BL   SetGpio
 		
 		MOV  R0, #15
@@ -52,14 +54,37 @@ MOVE_DERECHA:
 	
 		MOV  R0, #25000
 		BL   ESPERAMICRO				@ Rutina de espera
-	
+
+		
 		MOV  R0, #15
 		MOV  R1, #1
 		BL   SetGpio
-	
+		
 		MOV   R0, #25000
 		BL   ESPERAMICRO
 
+		@**  Cable naranja
+		MOV  R0, #14
+		MOV  R1, #1
+		BL   SetGpio
+		
+		MOV  R0, #15
+		MOV  R1, #0
+		BL   SetGpio
+		
+		MOV   R0, #25000
+		BL   ESPERAMICRO
+		
+		@**  Cable naranja
+		
+		MOV  R0, #15
+		MOV  R1, #1
+		BL   SetGpio
+		
+		MOV   R0, #25000
+		BL   ESPERAMICRO
+		
+		
 		POP   {R12}
 		SUBS  R12, #1
 		CMP   R12, #0
