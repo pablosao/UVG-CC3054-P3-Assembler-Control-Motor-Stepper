@@ -34,11 +34,11 @@ ESPERAMICRO:
 	POP   {PC}
 
 
-@****    Ciclo infinito para movimiento
+@****    Ciclo para movimiento a la derecha
 MOVE_DERECHA:
 	PUSH  {LR}
 	
-	MOV  R12, #6
+	MOV  R12, #12			@ Repetición para vuelta completa
 
 	movimientoD:
 		PUSH {R12}
@@ -52,7 +52,7 @@ MOVE_DERECHA:
 		MOV  R1, #0
 		BL   SetGpio
 	
-		MOV  R0, #25000
+		MOV  R0, #20000
 		BL   ESPERAMICRO				@ Rutina de espera
 
 		
@@ -60,7 +60,7 @@ MOVE_DERECHA:
 		MOV  R1, #1
 		BL   SetGpio
 		
-		MOV   R0, #25000
+		MOV   R0, #20000
 		BL   ESPERAMICRO
 
 		@**  Cable naranja
@@ -72,7 +72,7 @@ MOVE_DERECHA:
 		MOV  R1, #0
 		BL   SetGpio
 		
-		MOV   R0, #25000
+		MOV   R0, #20000
 		BL   ESPERAMICRO
 		
 		@**  Cable naranja
@@ -81,7 +81,7 @@ MOVE_DERECHA:
 		MOV  R1, #1
 		BL   SetGpio
 		
-		MOV   R0, #25000
+		MOV   R0, #20000
 		BL   ESPERAMICRO
 		
 		
@@ -91,6 +91,69 @@ MOVE_DERECHA:
 		BNE   movimientoD
 
 	POP    {PC}
+
+
+
+@****    Ciclo para movimiento a la izquierda
+MOVE_IZQUIERDA:
+	PUSH  {LR}
+	
+	MOV  R12, #12			@ Repetición para vuelta completa
+
+	movimientoI:
+		PUSH {R12}
+		
+		@**  Cable azul
+		MOV  R0, #14
+		MOV  R1, #1
+		BL   SetGpio
+		
+		MOV  R0, #15
+		MOV  R1, #1
+		BL   SetGpio
+	
+		MOV  R0, #20000
+		BL   ESPERAMICRO				@ Rutina de espera
+
+		
+		MOV  R0, #15
+		MOV  R1, #0
+		BL   SetGpio
+		
+		MOV   R0, #20000
+		BL   ESPERAMICRO
+
+		@**  Cable naranja
+		MOV  R0, #14
+		MOV  R1, #0
+		BL   SetGpio
+		
+		MOV  R0, #15
+		MOV  R1, #1
+		BL   SetGpio
+		
+		MOV   R0, #20000
+		BL   ESPERAMICRO
+		
+		@**  Cable naranja
+		
+		MOV  R0, #15
+		MOV  R1, #0
+		BL   SetGpio
+		
+		MOV   R0, #20000
+		BL   ESPERAMICRO
+		
+		
+		POP   {R12}
+		SUBS  R12, #1
+		CMP   R12, #0
+		BNE   movimientoI
+
+	POP    {PC}
+
+
+
 
 @****    Suma de numero de vueltas
 .align 2

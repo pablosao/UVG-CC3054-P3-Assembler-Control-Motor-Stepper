@@ -111,7 +111,7 @@ _confSys:
 	
 	@**   Inicia Programa
 	CMP   R0, #2
-	BLEQ  MOVE_DERECHA 
+	BLEQ  MOVE_IZQUIERDA 
 
 	CMP   R0, #3
 	BLEQ  _running
