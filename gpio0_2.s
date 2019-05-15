@@ -144,3 +144,4 @@ GetGpio:
 	and r5,r7
 	
 	POP   {PC}
+	

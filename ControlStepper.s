@@ -129,7 +129,7 @@ _error:
 
 	@ Esperamos 3 segundos para mostrar mensaje de error.
 	MOV   R0, #3
-	BL    ESPERA
+	BL    ESPERASEG
 
 	B     _running					@ Regresamos a rutina de ejecución
 
@@ -146,7 +146,7 @@ _errorSys:
 
 	@ Esperamos 3 segundos para mostrar mensaje de error.
 	MOV   R0, #3
-	BL    ESPERA
+	BL    ESPERASEG
 
 	B     _confSys
 

@@ -11,11 +11,24 @@
 
 @****    Recibe en R0 los segundos a esperar
 .align 2
-.global ESPERA
-ESPERA:
+.global ESPERASEG
+ESPERASEG:
 	PUSH  {LR}
 
-	bl    sleep		@ Espera tiempo pasado en R0
+	BL    sleep		@ Espera tiempo pasado en R0
+	NOP
+
+	POP   {PC}
+
+
+
+@****    Recibe en R0 los microsegundos a esperar
+.align 2
+.global ESPERAMICRO
+ESPERAMICRO:
+	PUSH  {LR}
+
+	BL    usleep 		@ Espera el tiempo pasado en R0
 	NOP
 
 	POP   {PC}
@@ -30,22 +43,22 @@ MOVE_DERECHA:
 	movimientoD:
 		PUSH {R12}
 		MOV  R0, #14
-		MOV  R1, #0
+		MOV  R1, #1
 		BL   SetGpio
 		
 		MOV  R0, #15
 		MOV  R1, #0
 		BL   SetGpio
 	
-		MOV   R0, #1
-		BL    ESPERA				@ Rutina de espera
+		MOV  R0, #25000
+		BL   ESPERAMICRO				@ Rutina de espera
 	
 		MOV  R0, #15
 		MOV  R1, #1
 		BL   SetGpio
 	
-		MOV   R0, #1
-		BL    ESPERA
+		MOV   R0, #25000
+		BL   ESPERAMICRO
 
 		POP   {R12}
 		SUBS  R12, #1
