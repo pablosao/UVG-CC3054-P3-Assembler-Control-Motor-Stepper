@@ -77,7 +77,7 @@ _running:
 
 
 
-@****    Configuración por medio de motor
+@****    Configuración por medio del sistema
 _confSys:
 
 	@** Limpiando terminal
@@ -105,17 +105,68 @@ _confSys:
 	LDR   R0, =opcionIn
 	LDR   R0, [R0]
 
-	@**   Configura parametros
+	@**   Inicia rutina de movimiento
 	CMP   R0, #1
-	BLEQ  _confSys
+	BLEQ  _confParametros
 	
-	@**   Inicia Programa
+	@**   Configura dirección
 	CMP   R0, #2
-	BLEQ  MOVE_IZQUIERDA 
+	BLEQ  _confDireccion
 
-	CMP   R0, #3
+	CMP   R0, #5
 	BLEQ  _running
 	BLGT  _errorSys
+
+
+@****    Configura dirección en la que se movera el motor
+_confDireccion:
+	
+	@** Limpiando terminal
+	LDR   R0, =CLEAR
+	BL    puts
+
+	@**   Despliegue de menu para configurar por softwrare
+	LDR   R0, =msjInDireccion
+	BL    puts
+	
+	@**  Desplegando parametros actuales
+	LDR  R0, =_DIRECCION
+	LDR  R0, [R0]
+	
+	CMP   R0, #1
+	LDREQ R0, =showDirDerecha				@ Si el movimiento es a la derecha (1), cargamos mensaje derecha
+	LDRNE R0, =showDirIzquierda				@ Si el movimiento es a la derecha (1), cargamos mensaje izquierda
+	
+	BL    puts
+	
+	@**   Mensaje de ingreso de opción:
+	LDR   R0, =msjOpcion
+	BL    puts
+	
+
+	@**   Comando para Ingreso de teclado
+	LDR   R0, =fIngreso
+	LDR   R1, =opcionIn
+	BL    scanf
+
+	@**   verificamos que se haya ingresado un número
+	CMP   R0, #0
+	BEQ   _errorDireccion
+
+	@**   Identificación de operaciones
+	LDR   R0, =opcionIn
+	LDR   R0, [R0]
+
+	CMP   R0, #1						@ Si R0 < 1
+	BLT   _errorDireccion					@ Se muestra error, no se aceptan engativos
+
+	CMP   R0, #2						@ Si R0 > 2
+	BGT   _errorDireccion					@ Se muestra error, no puede ser más de 2
+	
+	LDR   R1, =_DIRECCION
+	STR   R0, [R1]
+	B     _confSys
+
 
 
 @****    Error de ingreso de primer ciclo
@@ -152,6 +203,23 @@ _errorSys:
 	B     _confSys
 
 
+@****    Error de ingreso de segundo ciclo
+_errorDireccion:
+	LDR   R0, =opcionIn				@ Cargamos dirección de opción
+	MOV   R1, #0
+	STR   R1,[R0]					@ Restauramos valor inicial en 0
+	BL    getchar
+
+	LDR   R0, =msjError				@ Mostramos mensaje de error a usuario
+	BL    puts
+
+	@ Esperamos 3 segundos para mostrar mensaje de error.
+	MOV   R0, #3
+	BL    ESPERASEG
+
+	B     _confDireccion
+
+
 @****     Configuración por Hardware
 _confHardware:
 	b _exit
@@ -171,8 +239,12 @@ menu:
 
 .align 2
 menuSys:
-	.ascii "\tConfiguración por Sistema \n\n\t1) Configuración de Parametros. \n\t2) Iniciar Rutina. \n\t3) Rregresar.\n"
+	.ascii "\t\tConfiguración por Sistema \n\n\t1) Iniciar Rutina. \n\t2) Configurar Dirección. \n\t3) Configurar Vueltas (1 - 99). \n\t4) Configurar Repeticiones (1 - 99). \n\t5) Rregresar.\n"
 
+.align 2
+msjInDireccion:
+	.ascii "\t\tDirección de motor \n\t1) Mover a la derecha. \n\t2) mover a la izquierda."
+	
 .align 2
 msjOpcion:
 	.ascii "Ingrese Opción: "
@@ -192,6 +264,17 @@ opcionIn:
 .align 2
 msjError:
 	.asciz "\033[31;42m\n\t\tIngreso una opción incorrecta.\033[0m\n"
+
+
+.align 2
+.global showDirDerecha
+showDirDerecha:
+	.asciz "Dirección Actual: \033[36mDerecha\033[0m\n"
+	
+.align 2
+.global showDirIzquierda
+showDirIzquierda:
+	.asciz "Dirección Actual: \033[36mIzquierda\033[0m\n"
 
 .align 2
 .global CLEAR

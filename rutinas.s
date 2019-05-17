@@ -43,7 +43,6 @@ MOVE_DERECHA:
 	movimientoD:
 		PUSH {R12}
 		
-		@**  Cable azul
 		MOV  R0, #14
 		MOV  R1, #0
 		BL   SetGpio
@@ -52,18 +51,16 @@ MOVE_DERECHA:
 		MOV  R1, #0
 		BL   SetGpio
 	
-		MOV  R0, #20000
+		MOV  R0, #20000					@ Se mandan 0.02 segundos 
 		BL   ESPERAMICRO				@ Rutina de espera
-
 		
 		MOV  R0, #15
 		MOV  R1, #1
 		BL   SetGpio
 		
-		MOV   R0, #20000
-		BL   ESPERAMICRO
+		MOV   R0, #20000				@ Se mandan 0.02 segundos
+		BL   ESPERAMICRO				@ Rutina de espera
 
-		@**  Cable naranja
 		MOV  R0, #14
 		MOV  R1, #1
 		BL   SetGpio
@@ -72,17 +69,16 @@ MOVE_DERECHA:
 		MOV  R1, #0
 		BL   SetGpio
 		
-		MOV   R0, #20000
-		BL   ESPERAMICRO
+		MOV   R0, #20000				@ Se mandan 0.02 segundos
+		BL   ESPERAMICRO				@ Rutina de espera
 		
-		@**  Cable naranja
 		
 		MOV  R0, #15
 		MOV  R1, #1
 		BL   SetGpio
 		
-		MOV   R0, #20000
-		BL   ESPERAMICRO
+		MOV   R0, #20000				@ Se mandan 0.02 segundos
+		BL   ESPERAMICRO				@ Rutina de espera
 		
 		
 		POP   {R12}
@@ -103,7 +99,7 @@ MOVE_IZQUIERDA:
 	movimientoI:
 		PUSH {R12}
 		
-		@**  Cable azul
+		
 		MOV  R0, #14
 		MOV  R1, #1
 		BL   SetGpio
@@ -112,7 +108,7 @@ MOVE_IZQUIERDA:
 		MOV  R1, #1
 		BL   SetGpio
 	
-		MOV  R0, #20000
+		MOV  R0, #20000					@ Se mandan 0.02 segundos
 		BL   ESPERAMICRO				@ Rutina de espera
 
 		
@@ -120,8 +116,8 @@ MOVE_IZQUIERDA:
 		MOV  R1, #0
 		BL   SetGpio
 		
-		MOV   R0, #20000
-		BL   ESPERAMICRO
+		MOV   R0, #20000				@ Se mandan 0.02 segundos
+		BL   ESPERAMICRO				@ Rutina de espera
 
 		@**  Cable naranja
 		MOV  R0, #14
@@ -132,17 +128,17 @@ MOVE_IZQUIERDA:
 		MOV  R1, #1
 		BL   SetGpio
 		
-		MOV   R0, #20000
-		BL   ESPERAMICRO
+		MOV   R0, #20000				@ Se mandan 0.02 segundos
+		BL   ESPERAMICRO				@ Rutina de espera
 		
-		@**  Cable naranja
+		
 		
 		MOV  R0, #15
 		MOV  R1, #0
 		BL   SetGpio
 		
-		MOV   R0, #20000
-		BL   ESPERAMICRO
+		MOV   R0, #20000				@ Se mandan 0.02 segundos
+		BL   ESPERAMICRO				@ Rutina de espera
 		
 		
 		POP   {R12}
@@ -182,14 +178,19 @@ SUM_VUELTAS:
 
 .data
 .align 2
-.global _VUELTAS
-_VUELTAS:
+.global _VUELTAS_D
+_VUELTAS_D:
 	.word 0
+
+.align 2
+.global _VUELTAS_U
+_VUELTAS_U:
+	.word 3
 
 .align 2
 .global _DIRECCION
 _DIRECCION:
-	.word 0
+	.word 1
 
 .align 2
 .global _REPETICIONES
