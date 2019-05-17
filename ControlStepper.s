@@ -116,7 +116,7 @@ _confSys:
 
 	@**   Configura vueltas
 	CMP   R0, #3
-	BLEQ  
+	BLEQ  _inDatos
 
 	@**   Configura repeticiones
 	CMP   R0, #2
@@ -125,6 +125,52 @@ _confSys:
 	CMP   R0, #5
 	BLEQ  _running
 	BLGT  _errorSys
+
+@****    Ingreso de numero de vueltas y Repeticiones
+@****    :R12   con valor 1 si es vuelta o valor 2 si es repeticion 
+_inDatos:
+	PUSH   {R12}
+
+	@** Limpiando terminal
+	LDR   R0, =CLEAR
+	BL    puts
+
+	@**   Despliegue de menu para configurar por softwrare
+	LDR   R0, =menuSys
+	BL    puts
+
+	@**   Mensaje de ingreso de opción:
+	LDR   R0, =msjOpcion
+	BL    puts
+
+	@**   Comando para Ingreso de teclado
+	LDR   R0, =fIngreso
+	LDR   R1, =opcionIn
+	BL    scanf
+
+	@**   verificamos que se haya ingresado un número
+	CMP   R0, #0
+	BEQ   _errorSys
+
+	@**   Identificación de operaciones
+	LDR   R0, =opcionIn
+	LDR   R0, [R0]
+
+	
+	CMP  R0, #0
+	BLLT _errorDatos
+
+	CMP  R0, #9
+	BLGT _errorDatos
+
+	POP   {R12}
+	CMP   R12, #1
+	BLEQ  SUM_VUELTAS
+	BL    SUM_REPETICION
+
+	B     _confSys
+
+	
 
 
 @****    Configura dirección en la que se movera el motor
@@ -228,6 +274,22 @@ _errorDireccion:
 
 	B     _confDireccion
 
+@****    Error de ingreso de segundo ciclo
+_errorDatos:
+	LDR   R0, =opcionIn				@ Cargamos dirección de opción
+	MOV   R1, #0
+	STR   R1,[R0]					@ Restauramos valor inicial en 0
+	BL    getchar
+
+	LDR   R0, =msjError				@ Mostramos mensaje de error a usuario
+	BL    puts
+
+	@ Esperamos 3 segundos para mostrar mensaje de error.
+	MOV   R0, #3
+	BL    ESPERASEG
+
+	B     _inDatos
+
 
 @****     Configuración por Hardware
 _confHardware:
@@ -274,6 +336,13 @@ opcionIn:
 msjError:
 	.asciz "\033[31;42m\n\t\tIngreso una opción incorrecta.\033[0m\n"
 
+.align 2
+displayVueltas:
+	.asciz "Vueltas: \033[36m%d\033[0m\n"
+
+.align 2
+displayRepeticiones:
+	.asciz "Repeticiones: \033[36m%d\033[0m\n"
 
 .align 2
 .global showDirDerecha

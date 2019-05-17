@@ -197,7 +197,7 @@ SUM_VUELTAS:
 	BNE   storeData
 
 	ADD   R2, #1
-	CMP   R2, #99
+	CMP   R2, #9
 	MOVGT R2, #1	
 	MOV   R0, R2
 		
@@ -207,6 +207,31 @@ SUM_VUELTAS:
 	
 	POP   {PC}
 
+
+@****    Suma de numero de repeticiones de
+@****    : R0 Se manda con valor 0 si se quiere sumar desde boton
+@****         De lo contrario se manda con el valor a almacenar
+.align 2
+.global SUM_REPETICION
+SUM_REPETICION:
+	PUSH  {LR}
+	
+	LDR   R1, =_REPETICIONES
+	LDR   R2, [R1]
+	
+	CMP   R0, #0
+	BNE   storeData
+
+	ADD   R2, #1
+	CMP   R2, #9
+	MOVGT R2, #1	
+	MOV   R0, R2
+		
+	storeData:
+		STR   R0, [R1]
+		
+	
+	POP   {PC}
 
 
 .data
