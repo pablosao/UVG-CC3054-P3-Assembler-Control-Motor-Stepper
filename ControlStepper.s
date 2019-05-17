@@ -107,11 +107,20 @@ _confSys:
 
 	@**   Inicia rutina de movimiento
 	CMP   R0, #1
-	BLEQ  _confParametros
+	BLEQ  MUEVEMOTOR
+	BEQ   _confSys
 	
 	@**   Configura dirección
 	CMP   R0, #2
 	BLEQ  _confDireccion
+
+	@**   Configura vueltas
+	CMP   R0, #3
+	BLEQ  
+
+	@**   Configura repeticiones
+	CMP   R0, #2
+	BLEQ  
 
 	CMP   R0, #5
 	BLEQ  _running

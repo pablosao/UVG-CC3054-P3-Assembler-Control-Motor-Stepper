@@ -21,6 +21,37 @@ ESPERASEG:
 	POP   {PC}
 
 
+.align 2 
+.global MUEVEMOTOR
+MUEVEMOTOR:
+	PUSH  {LR}
+
+	@ Cargando cantidad de vueltas que realizara el motor
+	LDR   R10, =_VUELTAS
+	LDR   R10, [R10]
+	
+	@ Cargando dirección en la que se movera el motor
+	LDR   R11, =_DIRECCION
+	LDR   R11, [R11]
+
+	_move:
+		PUSH  {R11}
+		PUSH  {R10}
+
+		@ Muestra display
+
+		CMP   R11, #1
+		BLEQ  MOVE_DERECHA
+		BLNE  MOVE_IZQUIERDA
+
+		POP   {R10}
+		POP   {R11}
+
+		SUBS  R10, #1
+		CMP   R10, #0
+		BNE   _move
+
+	POP   {PC}
 
 @****    Recibe en R0 los microsegundos a esperar
 .align 2
@@ -152,6 +183,8 @@ MOVE_IZQUIERDA:
 
 
 @****    Suma de numero de vueltas
+@****    : R0 Se manda con valor 0 si se quiere sumar desde boton
+@****         De lo contrario se manda con el valor a almacenar
 .align 2
 .global SUM_VUELTAS
 SUM_VUELTAS:
@@ -178,14 +211,10 @@ SUM_VUELTAS:
 
 .data
 .align 2
-.global _VUELTAS_D
-_VUELTAS_D:
-	.word 0
-
-.align 2
-.global _VUELTAS_U
-_VUELTAS_U:
+.global _VUELTAS
+_VUELTAS:
 	.word 3
+
 
 .align 2
 .global _DIRECCION
