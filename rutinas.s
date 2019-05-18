@@ -20,6 +20,16 @@ ESPERASEG:
 
 	POP   {PC}
 
+@****    Recibe en R0 los microsegundos a esperar
+.align 2
+.global ESPERAMICRO
+ESPERAMICRO:
+	PUSH  {LR}
+
+	BL    usleep 		@ Espera el tiempo pasado en R0
+	NOP
+
+	POP   {PC}
 
 .align 2 
 .global MUEVEMOTOR
@@ -41,8 +51,11 @@ MUEVEMOTOR:
 		@ Muestra display
 
 		CMP   R11, #1
-		BLEQ  MOVE_DERECHA
-		BLNE  MOVE_IZQUIERDA
+		BLEQ  MOVE_IZQUIERDA
+		BLNE  MOVE_DERECHA
+
+		MOV   R0, #1
+		BL    ESPERASEG
 
 		POP   {R10}
 		POP   {R11}
@@ -50,17 +63,6 @@ MUEVEMOTOR:
 		SUBS  R10, #1
 		CMP   R10, #0
 		BNE   _move
-
-	POP   {PC}
-
-@****    Recibe en R0 los microsegundos a esperar
-.align 2
-.global ESPERAMICRO
-ESPERAMICRO:
-	PUSH  {LR}
-
-	BL    usleep 		@ Espera el tiempo pasado en R0
-	NOP
 
 	POP   {PC}
 
@@ -194,14 +196,14 @@ SUM_VUELTAS:
 	LDR   R2, [R1]
 	
 	CMP   R0, #0
-	BNE   storeData
+	BNE   storeDataVueltas
 
 	ADD   R2, #1
 	CMP   R2, #9
 	MOVGT R2, #1	
 	MOV   R0, R2
 		
-	storeData:
+	storeDataVueltas:
 		STR   R0, [R1]
 		
 	
@@ -220,14 +222,14 @@ SUM_REPETICION:
 	LDR   R2, [R1]
 	
 	CMP   R0, #0
-	BNE   storeData
+	BNE   storeDataRepeticiones
 
 	ADD   R2, #1
 	CMP   R2, #9
 	MOVGT R2, #1	
 	MOV   R0, R2
 		
-	storeData:
+	storeDataRepeticiones:
 		STR   R0, [R1]
 		
 	

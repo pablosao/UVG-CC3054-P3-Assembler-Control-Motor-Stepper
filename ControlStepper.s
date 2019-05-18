@@ -88,6 +88,9 @@ _confSys:
 	LDR   R0, =menuSys
 	BL    puts
 
+	@**  Despliegue de Parametros
+	BL   _displayParametros
+
 	@**   Mensaje de ingreso de opción:
 	LDR   R0, =msjOpcion
 	BL    puts
@@ -120,7 +123,7 @@ _confSys:
 
 	@**   Configura repeticiones
 	CMP   R0, #2
-	BLEQ  
+	BLEQ  _exit
 
 	CMP   R0, #5
 	BLEQ  _running
@@ -170,8 +173,6 @@ _inDatos:
 
 	B     _confSys
 
-	
-
 
 @****    Configura dirección en la que se movera el motor
 _confDireccion:
@@ -183,16 +184,9 @@ _confDireccion:
 	@**   Despliegue de menu para configurar por softwrare
 	LDR   R0, =msjInDireccion
 	BL    puts
-	
-	@**  Desplegando parametros actuales
-	LDR  R0, =_DIRECCION
-	LDR  R0, [R0]
-	
-	CMP   R0, #1
-	LDREQ R0, =showDirDerecha				@ Si el movimiento es a la derecha (1), cargamos mensaje derecha
-	LDRNE R0, =showDirIzquierda				@ Si el movimiento es a la derecha (1), cargamos mensaje izquierda
-	
-	BL    puts
+
+	@**  Despliegue de Parámetros actuales
+	BL   _displayParametros
 	
 	@**   Mensaje de ingreso de opción:
 	LDR   R0, =msjOpcion
@@ -215,13 +209,15 @@ _confDireccion:
 	CMP   R0, #1						@ Si R0 < 1
 	BLT   _errorDireccion					@ Se muestra error, no se aceptan engativos
 
-	CMP   R0, #2						@ Si R0 > 2
+	CMP   R0, #3						@ Si R0 > 2
 	BGT   _errorDireccion					@ Se muestra error, no puede ser más de 2
-	
+
+	CMP   R0, #3
+	BEQ   _confSys
+
 	LDR   R1, =_DIRECCION
 	STR   R0, [R1]
 	B     _confSys
-
 
 
 @****    Error de ingreso de primer ciclo
@@ -291,6 +287,35 @@ _errorDatos:
 	B     _inDatos
 
 
+@****   Despliegue de parametros condigurados
+_displayParametros:
+	PUSH  {LR}
+
+	LDR   R0, =msjDisplayParametros				@ Cargamos dirección de mensaje
+	BL    puts
+
+	@**   Desplegando Dirección actual
+	LDR   R0, =_DIRECCION
+	LDR   R0, [R0]
+	
+	CMP   R0, #1
+	LDREQ R0, =showDirDerecha				@ Si el movimiento es a la derecha (1), cargamos mensaje derecha
+	LDRNE R0, =showDirIzquierda				@ Si el movimiento es a la derecha (1), cargamos mensaje izquierda
+	
+	@**   Desplegando número de rotaciones
+	LDR   R0, =displayVueltas
+	LDR   R1, =_VUELTAS
+	LDR   R1, [R1]
+	BL    printf
+
+	@**   Desplegando número de repeticiones
+	LDR   R0, =displayRepeticiones
+	LDR   R1, =_REPETICIONES
+	LDR   R1, [R1]
+	BL    printf
+
+	POP   {PC}
+
 @****     Configuración por Hardware
 _confHardware:
 	b _exit
@@ -306,31 +331,27 @@ _exit:
 .data
 .align 2
 menu:
-	.ascii "\t\tMenú\n\t1) Configuración Sistema.\n\t2) Configuración Hardware.\n\t3) Instrucciones.\n\t4) Salir.\n"
+	.asciz "\t\tMenú\n\t1) Configuración Sistema.\n\t2) Configuración Hardware.\n\t3) Instrucciones.\n\t4) Salir.\n"
 
 .align 2
 menuSys:
-	.ascii "\t\tConfiguración por Sistema \n\n\t1) Iniciar Rutina. \n\t2) Configurar Dirección. \n\t3) Configurar Vueltas (1 - 99). \n\t4) Configurar Repeticiones (1 - 99). \n\t5) Rregresar.\n"
+	.asciz "\t\tConfiguración por Sistema \n\n\t1) Iniciar Rutina. \n\t2) Configurar Dirección. \n\t3) Configurar Vueltas (1 - 9). \n\t4) Configurar Repeticiones (1 - 9). \n\t5) Rregresar.\n"
 
 .align 2
 msjInDireccion:
-	.ascii "\t\tDirección de motor \n\t1) Mover a la derecha. \n\t2) mover a la izquierda."
+	.asciz "\t\tDirección de motor \n\t1) Rotar a la derecha. \n\t2) Rotar a la izquierda. \n\t3) Regresar."
 	
 .align 2
 msjOpcion:
-	.ascii "Ingrese Opción: "
+	.asciz "Ingrese Opción: "
 
 .align 2
 msjVueltas:
-	.ascii "Ingrese Número de Vueltas (de 1 a 99): "
+	.ascii "Ingrese Valor (de 1 a 9): "
 
 .align 2	
 fIngreso:
 	.asciz "%d"
-
-.align 2
-opcionIn:
-	.word 0
 
 .align 2
 msjError:
@@ -338,21 +359,21 @@ msjError:
 
 .align 2
 displayVueltas:
-	.asciz "Vueltas: \033[36m%d\033[0m\n"
+	.asciz "\nVueltas: \033[36m%d\033[0m\n"
 
 .align 2
 displayRepeticiones:
-	.asciz "Repeticiones: \033[36m%d\033[0m\n"
+	.asciz "\nRepeticiones: \033[36m%d\033[0m\n"
 
 .align 2
 .global showDirDerecha
 showDirDerecha:
-	.asciz "Dirección Actual: \033[36mDerecha\033[0m\n"
+	.asciz "\nDirección Actual: \033[36mDerecha\033[0m\n"
 	
 .align 2
 .global showDirIzquierda
 showDirIzquierda:
-	.asciz "Dirección Actual: \033[36mIzquierda\033[0m\n"
+	.asciz "\nDirección Actual: \033[36mIzquierda\033[0m\n"
 
 .align 2
 .global CLEAR
@@ -360,6 +381,15 @@ CLEAR:
 	.asciz "\033[H\033[J"
 
 .align 2
+.global msjDisplayParametros
+msjDisplayParametros:
+	.asciz "\nParámetros Configurados:"
+
+.align 2
 .global myloc
 myloc:
+	.word 0
+
+.align 2
+opcionIn:
 	.word 0
