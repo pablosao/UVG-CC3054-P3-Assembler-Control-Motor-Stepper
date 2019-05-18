@@ -36,33 +36,55 @@ ESPERAMICRO:
 MUEVEMOTOR:
 	PUSH  {LR}
 
-	@ Cargando cantidad de vueltas que realizara el motor
-	LDR   R10, =_VUELTAS
-	LDR   R10, [R10]
 	
 	@ Cargando dirección en la que se movera el motor
 	LDR   R11, =_DIRECCION
 	LDR   R11, [R11]
 
-	_move:
-		PUSH  {R11}
-		PUSH  {R10}
+	@ Cargando cantidad de vueltas que realizara el motor
+	LDR   R4, =_REPETICIONES
+	LDR   R4, [R4]
+	ADD   R4, #1
 
-		@ Muestra display
+	LDR   R0, =msj
+	MOV   R1, R4
+	bl    printf
 
-		CMP   R11, #1
-		BLEQ  MOVE_IZQUIERDA
-		BLNE  MOVE_DERECHA
+	_repMotor:
 
-		MOV   R0, #1
+		PUSH  {R4}
+
+		@ Cargando cantidad de vueltas que realizara el motor
+		LDR   R10, =_VUELTAS
+		LDR   R10, [R10]
+
+		_move:
+			PUSH  {R11}
+			PUSH  {R10}
+	
+			@ Muestra display
+	
+			CMP   R11, #1
+			BLEQ  MOVE_IZQUIERDA
+			BLNE  MOVE_DERECHA
+	
+			MOV   R0, #1
+			BL    ESPERASEG
+	
+			POP   {R10}
+			POP   {R11}
+	
+			SUBS  R10, #1
+			CMP   R10, #0
+			BNE   _move
+
+		MOV   R0, #2
 		BL    ESPERASEG
 
-		POP   {R10}
-		POP   {R11}
-
-		SUBS  R10, #1
-		CMP   R10, #0
-		BNE   _move
+		POP   {R4}
+		SUBS  R4, #1
+		CMP   R4, #0
+		BNE   _repMotor
 
 	POP   {PC}
 
@@ -121,7 +143,21 @@ MOVE_DERECHA:
 
 	POP    {PC}
 
+SHOW_DIRECTION:
+	PUSH  {LR}
 
+	MOV  R0, #18						@ Configurando GPIO 18 
+	
+	@**   Desplegando Dirección actual
+	LDR   R2, =_DIRECCION
+	LDR   R2, [R2]
+
+	CMP   R2, #1
+	MOVEQ R1, #1						@ Mostrando dirección a la derecha en GPIO 18
+	MOVNE R1, #0						@ Mostrando dirección a la izquierda en GPIO 18
+	BL   SetGpio
+
+	POP   {PC}
 
 @****    Ciclo para movimiento a la izquierda
 MOVE_IZQUIERDA:
@@ -242,7 +278,6 @@ SUM_REPETICION:
 _VUELTAS:
 	.word 3
 
-
 .align 2
 .global _DIRECCION
 _DIRECCION:
@@ -253,5 +288,7 @@ _DIRECCION:
 _REPETICIONES:
 	.word 0
 
-
+.align 2
+msj:
+	.asciz "Repeticion: %d\n"
 

@@ -18,16 +18,24 @@ main:
 	BL   GetGpioAddress			@ Llamamos dirección
 
 	/**   Configurando puertos para control de stepper   **/
-	MOV  R0, #14				@ Seteamos pin 
-	MOV  R1, #1				@ Configuramos salida
+	MOV  R0, #14				@ Seteamos pin 14
+	MOV  R1, #1					@ Configuramos salida
 
-	BL   SetGpioFunction			@ Configuramos puerto
+	BL   SetGpioFunction		@ Configuramos puerto
 
-	MOV  R0, #15				@ Seteamos pin 17
-	MOV  R1, #1				@ Configuramos salida
+	MOV  R0, #15				@ Seteamos pin 15
+	MOV  R1, #1					@ Configuramos salida
 
 	BL   SetGpioFunction
-	
+
+	MOV  R0, #18				@ Seteamos pin 18
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	@ Mostrando parametros iniciales en circuito
+	BL   SHOW_DIRECTION
+
 	B     _running
 
 
@@ -76,7 +84,6 @@ _running:
 	BLGT _error
 
 
-
 @****    Configuración por medio del sistema
 _confSys:
 
@@ -119,31 +126,41 @@ _confSys:
 
 	@**   Configura vueltas
 	CMP   R0, #3
+	MOVEQ R12, #1
 	BLEQ  _inDatos
 
 	@**   Configura repeticiones
-	CMP   R0, #2
-	BLEQ  _exit
+	CMP   R0, #4
+	MOVEQ R12, #2
+	BLEQ  _inDatos
 
 	CMP   R0, #5
 	BLEQ  _running
 	BLGT  _errorSys
 
+
 @****    Ingreso de numero de vueltas y Repeticiones
-@****    :R12   con valor 1 si es vuelta o valor 2 si es repeticion 
+@****    R12 -> 1 si configura vueltas, 2 si configura repeticiones 
 _inDatos:
-	PUSH   {R12}
+	PUSH  {R12}
 
 	@** Limpiando terminal
 	LDR   R0, =CLEAR
 	BL    puts
 
+	POP   {R12}
+	PUSH  {R12}
 	@**   Despliegue de menu para configurar por softwrare
-	LDR   R0, =menuSys
+	CMP   R12, #1
+	LDREQ R0, =msjIngresoVueltas
+	LDRNE R0, =msjIngresoRepeticion
 	BL    puts
 
+	@**  Despliegue de Parámetros actuales
+	BL   _displayParametros
+
 	@**   Mensaje de ingreso de opción:
-	LDR   R0, =msjOpcion
+	LDR   R0, =msjOpcionVal
 	BL    puts
 
 	@**   Comando para Ingreso de teclado
@@ -169,10 +186,9 @@ _inDatos:
 	POP   {R12}
 	CMP   R12, #1
 	BLEQ  SUM_VUELTAS
-	BL    SUM_REPETICION
+	BLNE  SUM_REPETICION
 
 	B     _confSys
-
 
 @****    Configura dirección en la que se movera el motor
 _confDireccion:
@@ -217,8 +233,11 @@ _confDireccion:
 
 	LDR   R1, =_DIRECCION
 	STR   R0, [R1]
-	B     _confSys
 
+	@ Mostrando parametros iniciales en circuito
+	BL   SHOW_DIRECTION
+
+	B     _confSys
 
 @****    Error de ingreso de primer ciclo
 _error:
@@ -236,7 +255,6 @@ _error:
 
 	B     _running					@ Regresamos a rutina de ejecución
 
-
 @****    Error de ingreso de segundo ciclo
 _errorSys:
 	LDR   R0, =opcionIn				@ Cargamos dirección de opción
@@ -252,7 +270,6 @@ _errorSys:
 	BL    ESPERASEG
 
 	B     _confSys
-
 
 @****    Error de ingreso de segundo ciclo
 _errorDireccion:
@@ -286,7 +303,6 @@ _errorDatos:
 
 	B     _inDatos
 
-
 @****   Despliegue de parametros condigurados
 _displayParametros:
 	PUSH  {LR}
@@ -297,11 +313,13 @@ _displayParametros:
 	@**   Desplegando Dirección actual
 	LDR   R0, =_DIRECCION
 	LDR   R0, [R0]
-	
+
 	CMP   R0, #1
 	LDREQ R0, =showDirDerecha				@ Si el movimiento es a la derecha (1), cargamos mensaje derecha
 	LDRNE R0, =showDirIzquierda				@ Si el movimiento es a la derecha (1), cargamos mensaje izquierda
 	
+	BL    puts
+
 	@**   Desplegando número de rotaciones
 	LDR   R0, =displayVueltas
 	LDR   R1, =_VUELTAS
@@ -331,11 +349,11 @@ _exit:
 .data
 .align 2
 menu:
-	.asciz "\t\tMenú\n\t1) Configuración Sistema.\n\t2) Configuración Hardware.\n\t3) Instrucciones.\n\t4) Salir.\n"
+	.asciz "\t\tMenú\n\t1) Configuración Sistema.\n\t2) Configuración Hardware.\n\t3) Instrucciones.\n\t4) Salir."
 
 .align 2
 menuSys:
-	.asciz "\t\tConfiguración por Sistema \n\n\t1) Iniciar Rutina. \n\t2) Configurar Dirección. \n\t3) Configurar Vueltas (1 - 9). \n\t4) Configurar Repeticiones (1 - 9). \n\t5) Rregresar.\n"
+	.asciz "\t\tConfiguración por Sistema \n\n\t1) Iniciar Rutina. \n\t2) Configurar Dirección. \n\t3) Configurar Vueltas (1 - 9). \n\t4) Configurar Repeticiones (1 - 9). \n\t5) Rregresar."
 
 .align 2
 msjInDireccion:
@@ -343,11 +361,19 @@ msjInDireccion:
 	
 .align 2
 msjOpcion:
-	.asciz "Ingrese Opción: "
+	.asciz "\n\nIngrese Opción: "
 
 .align 2
-msjVueltas:
-	.ascii "Ingrese Valor (de 1 a 9): "
+msjIngresoVueltas:
+	.asciz "\tConfiguración de Vultas"
+
+.align 2
+msjIngresoRepeticion:
+	.asciz "\tConfiguración de Repeticiones"
+
+.align 2
+msjOpcionVal:
+	.asciz "\n\nIngrese Valor (de 1 a 9): "
 
 .align 2	
 fIngreso:
@@ -359,21 +385,21 @@ msjError:
 
 .align 2
 displayVueltas:
-	.asciz "\nVueltas: \033[36m%d\033[0m\n"
+	.asciz "\tVueltas: \033[36m%d\033[0m"
 
 .align 2
 displayRepeticiones:
-	.asciz "\nRepeticiones: \033[36m%d\033[0m\n"
+	.asciz "\n\tRepeticiones: \033[36m%d\033[0m"
 
 .align 2
 .global showDirDerecha
 showDirDerecha:
-	.asciz "\nDirección Actual: \033[36mDerecha\033[0m\n"
+	.asciz "\tDirección Actual: \033[36mDerecha\033[0m"
 	
 .align 2
 .global showDirIzquierda
 showDirIzquierda:
-	.asciz "\nDirección Actual: \033[36mIzquierda\033[0m\n"
+	.asciz "\tDirección Actual: \033[36mIzquierda\033[0m"
 
 .align 2
 .global CLEAR
