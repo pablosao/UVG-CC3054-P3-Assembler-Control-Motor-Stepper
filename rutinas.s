@@ -629,6 +629,49 @@ SUM_REPETICION:
 	
 	POP   {PC}
 
+.align 2
+.global DISPLAY_BANNER
+DISPLAY_BANNER:
+	PUSH  {LR}
+
+	@** Limpiando terminal
+	LDR   R0, =CLEAR
+	BL    puts
+
+	@** Mostrando banner
+	LDR   R0, =disBanner1
+	BL    puts
+
+	LDR   R0, =disBanner2
+	BL    puts
+
+	LDR   R0, =disBanner3
+	BL    puts
+
+	LDR   R0, =disBanner4
+	BL    puts
+
+	LDR   R0, =disBanner5
+	BL    puts
+
+	LDR   R0, =disBanner6
+	BL    puts
+
+	LDR   R0, =disBanner7
+	BL    puts
+
+	LDR   R0, =disBanner8
+	BL    puts
+
+	LDR   R0, =disBanner9
+	BL    puts
+
+	LDR   R0, =disBanner10
+	BL    puts
+
+	POP   {PC}
+
+
 
 .data
 .align 2
@@ -646,7 +689,45 @@ _DIRECCION:
 _REPETICIONES:
 	.word 1
 
+
 .align 2
-msj:
-	.asciz "Repeticion: %d\n"
+disBanner1:
+	.asciz "\033[32m   _____  __"                                 
+
+.align 2
+disBanner2:
+	.asciz "  / ___/ / /_ ___   ____   ____   ___   _____"
+
+.align 2
+disBanner3:
+	.asciz "  \\__ \\ / __// _ \\ / __ \\ / __ \\ / _ \\ / ___/"
+
+.align 2
+disBanner4:
+	.asciz " ___/ // /_ /  __// /_/ // /_/ //  __// /"    
+
+.align 2
+disBanner5:
+	.asciz "/____/ \\__/ \\___// .___// .___/ \\___//_/"     
+
+.align 2
+disBanner6:
+	.asciz "                /_/    /_/\033[0m"                   
+
+.align 2
+disBanner7:
+	.asciz "\033[36m----------------------------------------------\033[0m"
+
+.align 2
+disBanner8:
+	.asciz "\033[33m               By Pablo Sao\033[0m"
+
+.align 2
+disBanner9:
+	.asciz "\033[33m	           2019\033[0m"
+
+.align 2
+disBanner10:
+	.asciz "\033[36m----------------------------------------------\033[0m"
+
 

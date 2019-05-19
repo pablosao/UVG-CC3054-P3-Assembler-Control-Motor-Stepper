@@ -85,6 +85,34 @@ main:
 
 	BL   SetGpioFunction
 
+	/**************************************
+	 *  Configurando entrada de botones   *
+	 **************************************/
+	MOV  R0, #2					@ Seteamos pin 26
+	MOV  R1, #0					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #3					@ Seteamos pin 19
+	MOV  R1, #0					@ Configuramos salida
+
+	BL   SetGpioFunction
+	
+	MOV  R0, #4					@ Seteamos pin 13
+	MOV  R1, #0					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #17					@ Seteamos pin 6
+	MOV  R1, #0					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #27					@ Seteamos pin 6
+	MOV  R1, #0					@ Configuramos salida
+
+	BL   SetGpioFunction
+
 	@ Mostrando parametros iniciales en circuito
 	BL   SHOW_DIRECTION
 
@@ -106,11 +134,11 @@ main:
 
 
 @****    Rutina para inicio de la seleccion de configuración
+.align 2
+.global _running
 _running:
 
-	@** Limpiando terminal
-	LDR   R0, =CLEAR
-	BL    puts
+	BL   DISPLAY_BANNER						@ Mostrando banner
 
 	@**   Despliegue de menú
 	LDR   R0, =menu
@@ -153,9 +181,7 @@ _running:
 @****    Configuración por medio del sistema
 _confSys:
 
-	@** Limpiando terminal
-	LDR   R0, =CLEAR
-	BL    puts
+	BL   DISPLAY_BANNER						@ Mostrando banner
 
 	@**   Despliegue de menu para configurar por softwrare
 	LDR   R0, =menuSys
@@ -210,9 +236,9 @@ _confSys:
 _inDatos:
 	PUSH  {R12}
 
-	@** Limpiando terminal
-	LDR   R0, =CLEAR
-	BL    puts
+
+	BL   DISPLAY_BANNER						@ Mostrando banner
+
 
 	POP   {R12}
 	PUSH  {R12}
@@ -276,10 +302,8 @@ _inDatos:
 
 @****    Configura dirección en la que se movera el motor
 _confDireccion:
-	
-	@** Limpiando terminal
-	LDR   R0, =CLEAR
-	BL    puts
+
+	BL   DISPLAY_BANNER						@ Mostrando banner
 
 	@**   Despliegue de menu para configurar por softwrare
 	LDR   R0, =msjInDireccion
