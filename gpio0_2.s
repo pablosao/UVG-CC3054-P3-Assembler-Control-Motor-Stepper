@@ -131,8 +131,8 @@ SetGpio:
 
 GetGpio:
 
-	CMP   R0,#53
-	MOVHI PC,LR
+	@CMP   R0,#53
+	@MOVHI PC,LR
 	
 	PUSH  {LR}
 	
@@ -140,7 +140,7 @@ GetGpio:
  	ldr r0, [r6]		@ obtener direccion de la memoria virtual 
 	ldr r5,[r0,#0x34]	@Direccion r0+0x34:lee en r5 estado de puertos de entrada
 	mov r7,#1
-	lsl r7,r0            @ pin a utilizar
+	lsl r7,r1            @ pin a utilizar
 	and r5,r7
 	
 	POP   {PC}

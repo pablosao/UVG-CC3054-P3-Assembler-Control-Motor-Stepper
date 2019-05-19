@@ -601,6 +601,16 @@ SUM_VUELTAS:
 	storeDataVueltas:
 		STR   R0, [R1]
 
+	/******************************************************
+	 *    Actualizando valores de Displays                *
+	 ******************************************************/
+
+	LDR   R2, =_VUELTAS
+	LDR   R2, [R2]
+
+	@**   actualizando display
+	BL    SHOW_DISPLAY1
+
 	POP   {PC}
 
 
@@ -626,6 +636,22 @@ SUM_REPETICION:
 	storeDataRepeticiones:
 		STR   R0, [R1]
 		
+
+	/******************************************************
+	 *    Actualizando valores de Displays                *
+	 ******************************************************/
+
+	LDR   R2, =_VUELTAS
+	LDR   R2, [R2]
+
+	@**   actualizando display
+	BL    SHOW_DISPLAY1
+
+	LDR   R2, =_REPETICIONES
+	LDR   R2, [R2]
+
+	@**   actualizando display
+	BL    SHOW_DISPLAY2
 	
 	POP   {PC}
 

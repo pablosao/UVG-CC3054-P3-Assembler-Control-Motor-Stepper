@@ -10,11 +10,43 @@
 .global HARDWARE_CONTROLER
 HARDWARE_CONTROLER:
 	
-	MOV  R0, #20000					@ Se mandan 0.02 segundos 
-	BL   ESPERAMICRO				@ Rutina de espera
-		
-	@ Verificamos si se suma un valor a vueltas
-	MOV   R1, #2						@ Configuramos pin 2
+	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
+	LDR  R1, [R1]			 
+	MOV  R0, R1			@ Movemos valor a r0
+	BL   ESPERAMICRO		@ Rutina de espera
+
+	BL   _DISHARDWARE
+
+	@ Comprobamos si se selecciona opción para salir de conf por hardware
+	MOV   R1, #2
+	BL    GetGpio
+
+	TEQ   R5, #0
+	BLNE  main
+
+	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
+	LDR  R1, [R1]			 
+	MOV  R0, R1			@ Movemos valor a r0
+	BL   ESPERAMICRO		@ Rutina de espera
+
+
+	@ Cambio de repeticiones
+	MOV   R1, #17
+	BL    GetGpio
+
+	TEQ   R5, #0
+	MOVNE R0, #0
+	BLNE  SUM_REPETICION
+	BLNE  HARDWARE_CONTROLER
+
+	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
+	LDR  R1, [R1]			 
+	MOV  R0, R1			@ Movemos valor a r0
+	BL   ESPERAMICRO		@ Rutina de espera
+
+
+	@ Cambio de vueltas
+	MOV   R1, #27
 	BL    GetGpio
 
 	TEQ   R5, #0
@@ -22,46 +54,43 @@ HARDWARE_CONTROLER:
 	BLNE  SUM_VUELTAS
 	BLNE  HARDWARE_CONTROLER
 
-	@ Verificamos si se suma un valor a repeticiones
-	MOV   R1, #3						@ Configuramos pin 3
+	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
+	LDR  R1, [R1]			 
+	MOV  R0, R1			@ Movemos valor a r0
+	BL   ESPERAMICRO		@ Rutina de espera
+
+
+
+	@ inicia rutina
+	MOV   R1, #3
 	BL    GetGpio
 
 	TEQ   R5, #0
-	MOVNE R0, #0
-	BLNE  SUM_REPETICION
-	BLNE  HARDWARE_CONTROLER
+	BNE   _movimiento	
+
+	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
+	LDR  R1, [R1]			 
+	MOV  R0, R1			@ Movemos valor a r0
+	BL   ESPERAMICRO		@ Rutina de espera
 
 
-	@ Verificamos si se suma un valor a repeticiones
-	MOV   R1, #4						@ Configuramos pin 4
+
+	@ Cambio de dirección del motor
+	MOV   R1, #4
 	BL    GetGpio
 
 	TEQ   R5, #0
-	MOVNE R0, #0
 	BLNE  _changeDirection
 	BLNE  HARDWARE_CONTROLER
 
+	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
+	LDR  R1, [R1]			 
+	MOV  R0, R1			@ Movemos valor a r0
+	BL   ESPERAMICRO		@ Rutina de espera
 
-
-	@ Verificamos para inicio de rutina
-	MOV   R1, #17						@ Configuramos pin 17
-	BL    GetGpio
-
-	TEQ   R5, #0
-	MOVNE R0, #0
-	BLNE  SUM_REPETICION
-	BLNE  HARDWARE_CONTROLER
-
-
-	@ Verificamos salida de hardware
-	MOV   R1, #27						@ Configuramos pin 27
-	BL    GetGpio
 	
-	@** Leemos boton de salida de hardware
-	TEQ   R5,#0							@ Si R5 == 0
-	BEQ   HARDWARE_CONTROLER				@ repite ciclo
-	BNE   _running							@ Si no es igual Regresa a menú de configuración
-
+	BL  HARDWARE_CONTROLER
+	
 
 
 _changeDirection:
@@ -80,3 +109,10 @@ _changeDirection:
 	BL   SHOW_DIRECTION					@ Mostramos el cambio de la dirección en circuito
 
 	POP   {PC}
+
+_movimiento:
+
+	BL    MUEVEMOTOR
+	BL    HARDWARE_CONTROLER
+	MOV   R5, #0
+

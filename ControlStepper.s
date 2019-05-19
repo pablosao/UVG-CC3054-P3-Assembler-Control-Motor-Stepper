@@ -167,7 +167,7 @@ _running:
 
 	@**   Configuración por hardware
 	CMP   R0, #2
-	BLEQ  _confHardware 
+	BLEQ  HARDWARE_CONTROLER 
 
 /*	@**   Impresión de configuración
 	CMP   R0, #3
@@ -282,21 +282,7 @@ _inDatos:
 	CMP   R12, #2
 	BLEQ  SUM_REPETICION
 
-	/******************************************************
-	 *    Actualizando valores de Displays                *
-	 ******************************************************/
-
-	LDR   R2, =_VUELTAS
-	LDR   R2, [R2]
-
-	@**   actualizando display
-	BL    SHOW_DISPLAY1
-
-	LDR   R2, =_REPETICIONES
-	LDR   R2, [R2]
-
-	@**   actualizando display
-	BL    SHOW_DISPLAY2
+	
 	
 	B     _confSys
 
@@ -442,10 +428,19 @@ _displayParametros:
 
 	POP   {PC}
 
-@****     Configuración por Hardware
-_confHardware:
-	b _exit
 
+_DISHARDWARE:
+	PUSH  {LR}
+
+	BL    DISPLAY_BANNER
+	LDR   R0, =msjConfHard
+	BL    puts
+	POP   {PC}
+
+.align 2
+.global drFracSeg 
+drFracSeg:
+	.word fracSeg
 
 _exit:
 	LDMFD SP!,{LR}
@@ -520,9 +515,18 @@ msjDisplayParametros:
 	.asciz "\nParámetros Configurados:"
 
 .align 2
+msjConfHard:
+	.asciz "\nConfiguración por Hardware. \n\t\033[31;42mSalir desde Hardware.\033[0m"
+
+.align 2
 .global myloc
 myloc:
 	.word 0
+
+.align 2
+.global fracSeg
+fracSeg:
+	.float 50000
 
 .align 2
 opcionIn:
