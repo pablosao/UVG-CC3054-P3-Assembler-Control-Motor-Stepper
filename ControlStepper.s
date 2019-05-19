@@ -17,7 +17,9 @@ main:
 	@**   Configurando pines de salida
 	BL   GetGpioAddress			@ Llamamos dirección
 
-	/**   Configurando puertos para control de stepper   **/
+	/**************************
+	 *  Configurando Stepper  *
+	 **************************/
 	MOV  R0, #14				@ Seteamos pin 14
 	MOV  R1, #1					@ Configuramos salida
 
@@ -28,13 +30,77 @@ main:
 
 	BL   SetGpioFunction
 
+	/****************************
+	 *  Configurando dirección  *
+	 ****************************/
 	MOV  R0, #18				@ Seteamos pin 18
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	/************************************
+	 *  Configurando display de Vueltas *
+	 ************************************/
+	MOV  R0, #21				@ Seteamos pin 21
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #20				@ Seteamos pin 20
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+	
+	MOV  R0, #16				@ Seteamos pin 16
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #12				@ Seteamos pin 12
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+
+	/*****************************************
+	 *  Configurando display de Repeticiones *
+	 *****************************************/
+	MOV  R0, #26				@ Seteamos pin 26
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #19				@ Seteamos pin 19
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+	
+	MOV  R0, #13				@ Seteamos pin 13
+	MOV  R1, #1					@ Configuramos salida
+
+	BL   SetGpioFunction
+
+	MOV  R0, #6					@ Seteamos pin 6
 	MOV  R1, #1					@ Configuramos salida
 
 	BL   SetGpioFunction
 
 	@ Mostrando parametros iniciales en circuito
 	BL   SHOW_DIRECTION
+
+	@ Cargando configuración de vueltas en display
+	LDR   R2, =_VUELTAS
+	LDR   R2, [R2]
+
+	@**  Desplegando vueltas en display
+	BL   SHOW_DISPLAY1
+
+	@ Cargando configuración de repeticiones en display
+	LDR   R2, =_REPETICIONES
+	LDR   R2, [R2]
+
+	@**  Desplegando repeticiones en display
+	BL   SHOW_DISPLAY2
 
 	B     _running
 
@@ -118,7 +184,7 @@ _confSys:
 	@**   Inicia rutina de movimiento
 	CMP   R0, #1
 	BLEQ  MUEVEMOTOR
-	BEQ   _confSys
+	BLEQ  _confSys
 	
 	@**   Configura dirección
 	CMP   R0, #2
@@ -150,6 +216,7 @@ _inDatos:
 
 	POP   {R12}
 	PUSH  {R12}
+	
 	@**   Despliegue de menu para configurar por softwrare
 	CMP   R12, #1
 	LDREQ R0, =msjIngresoVueltas
@@ -176,7 +243,6 @@ _inDatos:
 	LDR   R0, =opcionIn
 	LDR   R0, [R0]
 
-	
 	CMP  R0, #0
 	BLLT _errorDatos
 
@@ -186,8 +252,26 @@ _inDatos:
 	POP   {R12}
 	CMP   R12, #1
 	BLEQ  SUM_VUELTAS
-	BLNE  SUM_REPETICION
 
+	CMP   R12, #2
+	BLEQ  SUM_REPETICION
+
+	/******************************************************
+	 *    Actualizando valores de Displays                *
+	 ******************************************************/
+
+	LDR   R2, =_VUELTAS
+	LDR   R2, [R2]
+
+	@**   actualizando display
+	BL    SHOW_DISPLAY1
+
+	LDR   R2, =_REPETICIONES
+	LDR   R2, [R2]
+
+	@**   actualizando display
+	BL    SHOW_DISPLAY2
+	
 	B     _confSys
 
 @****    Configura dirección en la que se movera el motor
