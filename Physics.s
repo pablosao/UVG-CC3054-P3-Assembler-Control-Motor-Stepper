@@ -61,12 +61,14 @@ HARDWARE_CONTROLER:
 
 
 
-	@ inicia rutina
+	@ inicia rutina DE MOTOR
 	MOV   R1, #3
 	BL    GetGpio
 
 	TEQ   R5, #0
-	BNE   _movimiento	
+	BLNE  MUEVESTEPPER
+	BLNE  HARDWARE_CONTROLER	
+	
 
 	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
 	LDR  R1, [R1]			 
@@ -92,7 +94,7 @@ HARDWARE_CONTROLER:
 	BL  HARDWARE_CONTROLER
 	
 
-
+.align 2
 _changeDirection:
 	PUSH  {LR}
 
@@ -110,9 +112,84 @@ _changeDirection:
 
 	POP   {PC}
 
-_movimiento:
 
-	BL    MUEVEMOTOR
-	BL    HARDWARE_CONTROLER
-	MOV   R5, #0
+
+.align 2 
+MUEVESTEPPER:
+	PUSH  {LR}
+
+	
+	@ Cargando dirección en la que se movera el motor
+	LDR   R11, =_DIRECCION
+	LDR   R11, [R11]
+
+	@ Cargando cantidad de vueltas que realizara el motor
+	LDR   R4, =_REPETICIONES
+	LDR   R4, [R4]
+	@ADD   R4, #1
+
+	_repMotorH:
+
+		PUSH  {R4}
+
+		MOV   R2, R4
+
+		@**  Desplegando repeticiones en display
+		BL   SHOW_DISPLAY2
+
+		@ Cargando cantidad de vueltas que realizara el motor
+		LDR   R10, =_VUELTAS
+		LDR   R10, [R10]
+
+		_moveH:
+			PUSH  {R11}
+			PUSH  {R10}
+
+			MOV   R2, R10
+
+			@**   Desplegando vueltas en display
+			BL    SHOW_DISPLAY1
+
+			@ Muestra display
+	
+			CMP   R11, #1
+			BLEQ  MOVE_IZQUIERDA
+			BLNE  MOVE_DERECHA
+	
+			MOV   R0, #1
+			BL    ESPERASEG
+	
+			POP   {R10}
+			POP   {R11}
+	
+			SUBS  R10, #1
+			CMP   R10, #0
+			BNE   _moveH
+
+		MOV   R0, #2
+		BL    ESPERASEG
+
+		POP   {R4}
+		SUBS  R4, #1
+		CMP   R4, #0
+		BNE   _repMotorH
+
+	/***********************************************************
+	 * Desplegando valores iniciales de Vueltas y Repeticiones *
+	 ***********************************************************/
+	LDR   R2, =_VUELTAS
+	LDR   R2, [R2]
+
+	@**  Desplegando vueltas en display
+	BL   SHOW_DISPLAY1
+
+
+	LDR   R2, =_REPETICIONES
+	LDR   R2, [R2]
+
+	@**  Desplegando repeticiones en display
+	BL   SHOW_DISPLAY2
+
+	POP   {PC}
+	
 

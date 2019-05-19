@@ -432,9 +432,17 @@ _displayParametros:
 _DISHARDWARE:
 	PUSH  {LR}
 
+	@    Despliegue de Banner
 	BL    DISPLAY_BANNER
+
+	@    Despliegue de parametros
+	BL   _displayParametros
+
+	@     Despliegue de mensaje de estado en hardware
 	LDR   R0, =msjConfHard
 	BL    puts
+
+
 	POP   {PC}
 
 .align 2
@@ -516,7 +524,7 @@ msjDisplayParametros:
 
 .align 2
 msjConfHard:
-	.asciz "\nConfiguración por Hardware. \n\t\033[31;42mSalir desde Hardware.\033[0m"
+	.asciz "\n\nConfiguración por Hardware. \n\t\033[31;42mSalir desde Hardware.\033[0m"
 
 .align 2
 .global myloc

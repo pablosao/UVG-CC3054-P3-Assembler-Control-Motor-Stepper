@@ -106,11 +106,11 @@ MUEVEMOTOR:
 	BL   SHOW_DISPLAY2
 
 	BL   getchar
-
 	POP   {PC}
 
 
 @****    Ciclo para movimiento a la derecha
+.align 2
 MOVE_DERECHA:
 	PUSH  {LR}
 	
