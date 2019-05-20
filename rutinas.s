@@ -56,9 +56,14 @@ MUEVEMOTOR:
 		LDR   R10, =_VUELTAS
 		LDR   R10, [R10]
 
+		POP   {R4}		@ Restaurando R4
+		PUSH  {R4}		@ Guaredando R4 en stack
 		_move:
 			PUSH  {R11}
 			PUSH  {R10}
+
+			@Envio de parametros para actualizar en pantalla para numero de vueltas
+			BL    displayConteo
 
 			MOV   R2, R10
 
@@ -697,6 +702,47 @@ DISPLAY_BANNER:
 
 	POP   {PC}
 
+.align 2
+.global DISPLAY_BANNER_REP
+DISPLAY_BANNER_REP:
+	PUSH  {LR}
+
+	@** Limpiando terminal
+	LDR   R0, =CLEAR
+	BL    puts
+
+	@** Mostrando banner
+	LDR   R0, =disRep1
+	BL    puts
+
+	LDR   R0, =disRep2
+	BL    puts
+
+	LDR   R0, =disRep3
+	BL    puts
+
+	LDR   R0, =disRep4
+	BL    puts
+
+	LDR   R0, =disRep5
+	BL    puts
+
+	LDR   R0, =disRep6
+	BL    puts
+
+	LDR   R0, =disRep7
+	BL    puts
+
+	LDR   R0, =disRep8
+	BL    puts
+
+	LDR   R0, =disRep9
+	BL    puts
+
+	LDR   R0, =disRep10
+	BL    puts
+
+	POP   {PC}
 
 
 .data
@@ -756,4 +802,42 @@ disBanner9:
 disBanner10:
 	.asciz "\033[36m----------------------------------------------\033[0m"
 
+.align 2
+disRep1:
+	.asciz "\033[36m███████╗     ██╗███████╗ ██████╗██╗   ██╗████████╗ █████╗ ███╗   ██╗██████╗  ██████╗\033[0m" 
 
+.align 2
+disRep2:
+	.asciz "\033[36m██╔════╝     ██║██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔══██╗████╗  ██║██╔══██╗██╔═══██╗\033[0m"
+
+.align 2
+disRep3:
+	.asciz "\033[36m█████╗       ██║█████╗  ██║     ██║   ██║   ██║   ███████║██╔██╗ ██║██║  ██║██║   ██║\033[0m"
+
+.align 2
+disRep4:
+	.asciz "\033[36m██╔══╝  ██   ██║██╔══╝  ██║     ██║   ██║   ██║   ██╔══██║██║╚██╗██║██║  ██║██║   ██║\033[0m"
+
+.align 2
+disRep5:
+	.asciz "\033[36m███████╗╚█████╔╝███████╗╚██████╗╚██████╔╝   ██║   ██║  ██║██║ ╚████║██████╔╝╚██████╔╝\033[0m"
+
+.align 2
+disRep6:
+	.asciz "\033[36m╚══════╝ ╚════╝ ╚══════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝\033[0m"
+
+.align 2
+disRep7:
+	.asciz "\033[35m---------------------------------------------------------------------------------------\033[0m"
+
+.align 2
+disRep8:
+	.asciz "\033[32m                                     By Pablo Sao\033[0m"
+
+.align 2
+disRep9:
+	.asciz "\033[32m                                        2019\033[0m"
+
+.align 2
+disRep10:
+	.asciz "\033[35m---------------------------------------------------------------------------------------\033[0m"	

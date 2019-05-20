@@ -12,7 +12,7 @@ HARDWARE_CONTROLER:
 	
 	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
 	LDR  R1, [R1]			 
-	MOV  R0, R1			@ Movemos valor a r0
+	MOV  R0, R1				@ Movemos valor a r0
 	BL   ESPERAMICRO		@ Rutina de espera
 
 	BL   _DISHARDWARE
@@ -26,7 +26,7 @@ HARDWARE_CONTROLER:
 
 	LDR  R1, =drFracSeg		@ Cargamos dirección de valor en usegundos
 	LDR  R1, [R1]			 
-	MOV  R0, R1			@ Movemos valor a r0
+	MOV  R0, R1				@ Movemos valor a r0
 	BL   ESPERAMICRO		@ Rutina de espera
 
 
@@ -141,10 +141,16 @@ MUEVESTEPPER:
 		LDR   R10, =_VUELTAS
 		LDR   R10, [R10]
 
+		POP   {R4}		@ Restaurando R4
+		PUSH  {R4}		@ Guaredando R4 en stack
 		_moveH:
 			PUSH  {R11}
 			PUSH  {R10}
 
+			
+			@Envio de parametros para actualizar en pantalla para numero de vueltas
+			BL    displayConteo
+			
 			MOV   R2, R10
 
 			@**   Desplegando vueltas en display
@@ -192,4 +198,42 @@ MUEVESTEPPER:
 
 	POP   {PC}
 	
+@****    Muestra conteo regresivo de datos
+@****    R4, Repeticiones
+@****    R10, Vueltas
+.align 2
+.global displayConteo
+displayConteo:
+	PUSH  {LR}
 
+	@** Limpiando terminal
+	LDR   R0, =CLEAR
+	BL    puts
+
+	@** Mostrando banner de ejecución
+	BL   DISPLAY_BANNER_REP
+
+	@**   Desplegando Dirección actual
+	LDR   R0, =_DIRECCION
+	LDR   R0, [R0]
+
+	CMP   R0, #1
+	LDREQ R0, =showDirDerecha				@ Si el movimiento es a la derecha (1), cargamos mensaje derecha
+	LDRNE R0, =showDirIzquierda				@ Si el movimiento es a la derecha (1), cargamos mensaje izquierda
+	BL    puts
+	
+	
+	@**   Desplegando número de rotaciones
+	LDR   R0, =displayVueltas
+	MOV   R1, R10
+	BL    printf
+
+	@**   Desplegando número de repeticiones
+	LDR   R0, =displayRepeticiones
+	MOV   R1, R4
+	BL    printf
+	
+	LDR   R0, =msjHardConteo
+	BL    puts
+
+	POP  {PC}

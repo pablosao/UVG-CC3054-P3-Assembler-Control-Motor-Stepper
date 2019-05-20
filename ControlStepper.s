@@ -429,6 +429,7 @@ _displayParametros:
 	POP   {PC}
 
 
+@****    Despliegue de banner y parametros cuando esta en en opción de Hardware
 _DISHARDWARE:
 	PUSH  {LR}
 
@@ -490,17 +491,21 @@ msjOpcionVal:
 fIngreso:
 	.asciz "%d"
 
+
+.align 2
+.global displayRepeticiones
+displayRepeticiones:
+	.asciz "\n\tRepeticiones: \033[36m%d\033[0m"
+
+
 .align 2
 msjError:
 	.asciz "\033[31;42m\n\t\tIngreso una opción incorrecta.\033[0m\n"
 
 .align 2
+.global displayVueltas
 displayVueltas:
 	.asciz "\tVueltas: \033[36m%d\033[0m"
-
-.align 2
-displayRepeticiones:
-	.asciz "\n\tRepeticiones: \033[36m%d\033[0m"
 
 .align 2
 .global showDirDerecha
@@ -525,6 +530,11 @@ msjDisplayParametros:
 .align 2
 msjConfHard:
 	.asciz "\n\nConfiguración por Hardware. \n\t\033[31;42mSalir desde Hardware.\033[0m"
+
+.align
+.global msjHardConteo
+msjHardConteo:
+	.asciz "\n\n\t\033[31;42mConfiguración por Hardware.\033[0m"
 
 .align 2
 .global myloc
